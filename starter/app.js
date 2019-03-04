@@ -9,19 +9,26 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer, gamePlaying
+var scores, roundScore, activePlayer, gamePlaying, firstDiceSix, secondDiceSix, scoreToReach
+
+
 
 init();
 
 
 function init(){
+    
     gamePlaying = true
     scores = [0,0]
     roundScore = 0
     activePlayer = 0 //0 is player1, 1 is player2
+    firstDiceSix = false
+    scoreToReach = 100
     
     //This will remove the dice from the get go
     document.querySelector(".dice").style.display = 'none'
+    document.querySelector(".dice1").style.display = 'none'
+
     
     //These will set the score and current's to zero.
     document.getElementById('score-0').textContent = "0"
@@ -38,19 +45,57 @@ function init(){
 
 
 document.querySelector('.btn-roll').addEventListener('click', function() {
-    //debugger;
+    //debugger
     if (gamePlaying){
-        //1. Random number needed
-        var dice = Math.floor(Math.random() * 6) + 1
+        //1. Random number needed 3/3/19 - Second dice was added
+        //return Math.floor(Math.random()*(max-min+1)+min);
+        //return Math.floor(Math.random()*(6-2+1)+2); 
+        var dice = Math.floor(Math.random()*(6-2+1)+2)
+        var dice1 = Math.floor(Math.random()*(6-2+1)+2)
+
+        console.log(dice + ' and ' + dice1)
+    
+        // If this is the first time player hits a six, make the variable true
+        if (dice === 6 && firstDiceSix == false){
+            firstDiceSix = true
+        }else if (firstDiceSix == true && dice === 6){
+            secondDiceSix = true
+        }else if (firstDiceSix == true && secondDiceSix == true){
+
+            // reset the die 
+            firstDiceSix = false
+            secondDiceSix = false
+
+            // reset the score of the Global and Current of activePlayer
+            document.getElementById('score-' + activePlayer).textContent = "0"
+            document.getElementById('current-' + activePlayer).textContent = "0"
+            
+            
+            //Go to the next player
+            nextPlayer()
+        }
 
         //2. Need to display
+        // Add another dice. Override the 'left' positioning to 45 and 55%?
         var diceDOM = document.querySelector('.dice')
+        var diceDOM1 = document.querySelector('.dice1')
+
+        //diceDOM1.style.display = 'block'
+        //diceDOM1.style.left = "55%"
         diceDOM.style.display = 'block'
+        diceDOM.style.left = "45%"
         diceDOM.src = 'dice-' + dice + '.png'
 
-        if (dice !== 1){
+        diceDOM1.style.display = 'block'
+        diceDOM1.style.left = "55%"
+        diceDOM1.src = 'dice-' + dice1 + '.png'
+        //diceDOM1.src = 'dice-' + dice1 + '.png'
+
+
+        if (dice !== 1 && dice1 !== 1){
             //Add Score
-            roundScore += dice //updates the round score
+            var total = dice + dice1
+            roundScore += total //updates the round score
             document.querySelector('#current-' + activePlayer).textContent = roundScore //displays the round score
         }else{
             nextPlayer()
@@ -58,6 +103,12 @@ document.querySelector('.btn-roll').addEventListener('click', function() {
             
         }
         
+})
+
+document.getElementById('submitBtn').addEventListener('click', function (){
+    
+    // get the value of what is in the textbox and then set it to scoreToReach
+    scoreToReach = document.getElementById("setScoreTextBox").value
 })
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
@@ -68,11 +119,13 @@ document.querySelector('.btn-hold').addEventListener('click', function() {
         // Update the UI
         document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer]
 
+        //var scoreToReach = 10
         //Check if the player has won the game
-        if (scores[activePlayer] >= 10){
+        if (scores[activePlayer] >= scoreToReach){
             //document.getElementById('name-' + activePlayer).style.color = "#DC143C"
             document.querySelector('#name-' + activePlayer).textContent = 'Winner!'
             document.querySelector('.dice').style.display = 'none'
+            document.querySelector('.dice1').style.display = 'none'
             document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner')
             document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active')
             gamePlaying = false
@@ -93,64 +146,9 @@ function nextPlayer(){
     document.querySelector(".player-1-panel").classList.toggle('active')
 
     document.querySelector(".dice").style.display = 'none'
+    document.querySelector(".dice1").style.display = 'none'
 
 }
 
-
+// New Game button
 document.querySelector('.btn-new').addEventListener('click',init) 
-
-/*
-function(){
-// Set the panels back to normal
-document.querySelector('.player-0-panel').classList.remove('winner')
-document.querySelector('.player-0-panel').classList.add('active')
-document.querySelector('.player-1-panel').classList.remove('winner')
-
-// Remove the global scores and Remove the current scores
-document.getElementById('score-0').textContent = "0"
-document.getElementById('score-1').textContent = "0"
-document.getElementById('current-0').textContent = "0"
-document.getElementById('current-1').textContent = "0"
-
-// Set the label for the activePlayer back to Player 1 or 2
-if (activePlayer === 0){
-    document.querySelector('#name-' + activePlayer).textContent = 'Player 1'
-}else{
-    document.querySelector('#name-' + activePlayer).textContent = 'Player 2'
-}
-// Set the roundScore back to 0
-roundScore = 0
-scores = [0,0]
-
-// Reset the activePlayer to 0
-activePlayer = 0
-
-// Get rid of the dice
-document.querySelector(".dice").style.display = 'none'
-
-})
-
-
-//if Player 2 has won the game check to see if he has a score of 100 or above
-}
-
-//next player is toggled
-activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;   
-document.querySelector(".player-0-panel").classList.toggle('active')
-document.querySelector(".player-1-panel").classList.toggle('active')
-
-//current score gets added to the actual score
-
-
-//current score is now set to 0
-if (activePlayer === 0){
-document.getElementById('current-0').textContent = document.getElementById('score-0').textContent
-document.getElementById('current-0').textContent = "0"
-}else{
-document.getElementById('current-1').textContent = document.getElementById('current-1').textContent
-document.getElementById('current-1').textContent = "0"
-}   
-
-*/
-
-
