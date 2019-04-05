@@ -11,5 +11,5 @@ function reverseInt(num){
     return tempTable.join("");
 
 }
-myInt = 69
+myInt = 19
 reverseInt(myInt)
